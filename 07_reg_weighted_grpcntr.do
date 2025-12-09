@@ -528,7 +528,7 @@ outreg2 using $M/mlogit_l.doc, label stats(coef se) aster() ///
 	adds(Pseudo R2, e(r2_p)) dec(2) append nocons
 
 
-
+	
 ****************
 *** PLOT AME ***
 ****************
