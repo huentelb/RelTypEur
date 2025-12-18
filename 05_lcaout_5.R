@@ -136,6 +136,10 @@ class.lab.p <- as.character(c(paste0("Tight-knit (", post[5,2], "%)"),
 
 # Conditional Item Response Probabilities
 # Stacked Bar Plot
+
+w = 800
+h = 500
+
 png(file = paste0(folder.graph, paste0("condprop_",kin.l,"_", best, ".png")), 
     width = w, height = h)
 ggplot(lcmodel,aes(x = L2, y = value, fill = Var2)) + 
@@ -158,7 +162,7 @@ ggplot(lcmodel,aes(x = L2, y = value, fill = Var2)) +
                               "cnf_lca" = "Conflict",
                               "cnt_lca" = "Frequency\nof contact",
                               "mon_lca" = "Financial\nsupport",
-                              "sup_lca" = "Emotional\nsupport",
+                              "sup_lca" = "Social\nsupport",
                               "tra_lca" = "Geographic\nproximity"),
                    limits = c("tra_lca", "cnt_lca", "clo_lca", "sup_lca", "mon_lca", "cnf_lca")) +
   theme(
@@ -192,7 +196,7 @@ ggplot(
                               "cnf_lca" = "Conflict",
                               "cnt_lca" = "Frequency\nof contact",
                               "mon_lca" = "Financial\nsupport",
-                              "sup_lca" = "Emotional\nsupport",
+                              "sup_lca" = "Social\nsupport",
                               "tra_lca" = "Geographic\nproximity"),
                    limits = c("tra_lca", "cnt_lca", "clo_lca", "sup_lca", "mon_lca", "cnf_lca")) +
   scale_color_okabeito(name = "Class", 
@@ -214,7 +218,8 @@ ggplot(
   theme(legend.text = element_text(
     lineheight = .8,
     size = 10), 
-    legend.key.height = unit(.8, "cm"))
+    legend.key.height = unit(.8, "cm")) +
+  theme_minimal()
 dev.off()
 
 # As Bars (by relationship indicators)
@@ -232,7 +237,7 @@ ggplot(aes(x = factor(L2), y = value, fill = Var1, group = Var1)) +
                               "cnf_lca" = "Conflict",
                               "cnt_lca" = "Frequency\nof contact",
                               "mon_lca" = "Financial\nsupport",
-                              "sup_lca" = "Emotional\nsupport",
+                              "sup_lca" = "Social\nsupport",
                               "tra_lca" = "Geographic\nproximity"),
                    limits = c("tra_lca", "cnt_lca", "clo_lca", "sup_lca", "mon_lca", "cnf_lca")) +
   scale_fill_okabeito(name = "Class", 

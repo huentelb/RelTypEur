@@ -38,8 +38,8 @@ library(see)
 # original <- read.dta("/Users/Bettina/Documents/datasets/KINMATRIX/kinmatrix-prepared_v03_s12.dta", convert.factors = FALSE)
 # save(original, file = "/Users/Bettina/Documents/datasets/KINMATRIX/kinmatrix-prepared_v03_s12.RData")
 
-load("/Users/bhuenteler/Documents/datasets/KINMATRIX/kinmatrix-prepared_v03_s12.RData")
-load("/Users/bhuenteler/Documents/datasets/KINMATRIX/factors_v03.RData")
+load("/Users/bhuenteler/Documents/Documents - DIW-MAC-006/datasets/KINMATRIX/kinmatrix-prepared_v03_s12.RData")
+load("/Users/bhuenteler/Documents/Documents - DIW-MAC-006/datasets/KINMATRIX/factors_v03.RData")
 
 # add suffix to vars in factors dataframe
 suffix <- paste0(names(factors), ".l")

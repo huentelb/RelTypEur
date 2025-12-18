@@ -27,6 +27,7 @@ global M	"$WD/graphs/251104/M11_median/lc5_output/ame_weighted_NORgrp"
 set more off, perm
 set scheme white_tableau, perm 
 set showbaselevels on
+graph set window fontface "Times New Roman"
 
 
 
@@ -52,6 +53,11 @@ global cl3 "Disharmonious-but-supportive"
 global cl4 "Intimate-but-distant"
 global cl5 "Detached"
 
+global cl1b "Tight-knit"
+global cl2b "Connected-but-""autonomous"								
+global cl3b "Disharmonious-""but-supportive"								
+global cl4b "Intimate-""but-distant"
+global cl5b "Detached"
 
 * recode classes so they match labels
 recode class (5=1)(3=2)(2=3)(4=4)(1=5)
@@ -536,9 +542,11 @@ outreg2 using $M/mlogit_l.doc, label stats(coef se) aster() ///
 
 * graph style settings
 grstyle init
-grstyle set plain, grid horizontal
+grstyle set plain, grid 
+grstyle set lpattern solid: bygraph
+grstyle set margin "5pt 15pt 50pt 5pt": graph
 grstyle set color Okabe, select(2/6)
-grstyle set color Okabe, select(2/6):  p#markline
+grstyle set color Okabe, select(2/6): p#markline
 grstyle set symbol o t s + sh 
 
 		
@@ -640,6 +648,14 @@ coefplot 	(m1, label("$cl1")) 	///
 		
 *** 4. Plot AME of country only
 
+grstyle init
+grstyle set plain, grid 
+grstyle set lpattern solid: major_grid
+grstyle set color Okabe, select(2/6)
+grstyle set color Okabe, select(2/6): p#markline
+grstyle set symbol o t s + sh 										
+
+
 coefplot 	(m1, label("$cl1")) 	///
 			(m2, label("$cl2")) 	///
 			(m3, label("$cl3")) 	///
@@ -655,12 +671,31 @@ coefplot 	(m1, label("$cl1")) 	///
 	title("Average Marginal Effects", size(4)) 						///
 	note("Missing imputed with 0 - 'detached'" 						///
 		"N = `e(N)' observations", size(2))							///
-	name(covariates_base_nokin, replace)
+	name(covariates_base_nokin, replace)	
 		
 		gr export $M/ame_cov_l_cntry.png, replace
 		gr export $M/ame_cov_l_cntry.pdf, replace
 		gr save $M/ame_cov_l_cntry, replace
 
+		
+coefplot 	m1, bylabel("$cl1b") nokey msymbol(o) ||	///
+			m2, bylabel("$cl2b") nokey msymbol(t) ||	///
+			m3, bylabel("$cl3b") nokey msymbol(s) ||	///
+			m4, bylabel("$cl4b") nokey msymbol(+) ||	///
+			m5, bylabel("$cl5b") nokey msymbol(sh) ||,	///
+	recast(scatter) norecycle 									///
+	drop(_cons *kin_cat_l) keep(*cntry) omitted baselevels		///
+	xtitle("Effects on Probability") 							///
+	xline(0, lwidth(thin) lcolor(gs10) lpattern(solid)) 		///
+	///ysize(13) xsize(10) 										///
+	byopts(row(1))												///
+	msize(medlarge)												///
+	name(covariates_base_nokin_sep, replace)	
+
+		gr export $M/ame_cov_l_cntry_sep.png, replace
+		gr export $M/ame_cov_l_cntry_sep.pdf, replace
+		gr save $M/ame_cov_l_cntry_sep, replace	
+	
 		
 *** 5. Plot AME of kin category only
 

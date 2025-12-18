@@ -44,12 +44,12 @@ med_cou <- kin_name %>%
 # incl and Below median median -> 1
 
 # Model name (different model for different cut-offs)
-model <- "M11_med_cnf2"
+model <- "M11_median"
 
 
 lca.df <- kin %>%
   # continuous -> apply cut-off
-  mutate(cnf_lca = ifelse(rel_cnf <= 2 | is.na(rel_cnf), 1, 2)) %>% # 1. none at all - 4. a great deal (at least "a little" 2)
+  mutate(cnf_lca = ifelse(rel_cnf <= med_cnf | is.na(rel_cnf), 1, 2)) %>% # 1. none at all - 4. a great deal (at least "a little" 2)
   mutate(cnt_lca = ifelse(rel_cnt >= med_cnt | is.na(rel_cnt), 1, 2)) %>% # 1. daily - 6. never (at least "once per month" 3)
   mutate(tra_lca = ifelse(rel_tra >= med_tra | is.na(rel_tra), 1, 2)) %>% # 1. same building - 5. >=1 hrs (within 1 hour)
   mutate(clo_lca = ifelse(rel_clo <= med_clo | is.na(rel_clo), 1, 2)) %>% # 1. not at all - 5. very close (at least "very close")
