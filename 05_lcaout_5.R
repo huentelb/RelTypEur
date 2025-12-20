@@ -222,6 +222,52 @@ ggplot(
   theme_minimal()
 dev.off()
 
+
+pdf(file = paste0(folder.graph, paste0("latprof_",kin.l,"_", best, ".pdf")), 
+    width = 8, height = 5)
+lcmodel %>% 
+  filter(Var2 == "Pr(2)") %>% 
+  ggplot(
+    aes(x = factor(L2), 
+        y = value, 
+        colour = Var1, group = Var1, shape = Var1)) + 
+  geom_line(size = .8) +
+  geom_point(size = 4) +
+  geom_text(
+    aes(label = round(value, digits = 2)), 
+    vjust = -1.5, size = 3, fontface = "bold", show.legend = FALSE, position = position_dodge(.4)) +
+  labs(x = "Manifest items", 
+       y = "Conditional item response probabilities") +
+  scale_x_discrete(labels = c("clo_lca" = "Emotional\ncloseness",
+                              "cnf_lca" = "Conflict",
+                              "cnt_lca" = "Frequency\nof contact",
+                              "mon_lca" = "Financial\nsupport",
+                              "sup_lca" = "Social\nsupport",
+                              "tra_lca" = "Geographic\nproximity"),
+                   limits = c("tra_lca", "cnt_lca", "clo_lca", "sup_lca", "mon_lca", "cnf_lca")) +
+  scale_color_okabeito(name = "Class", 
+                       labels = class.lab.p,
+                       # order of legend = highest probs to lowest probs
+                       limits = c("class 5: ",
+                                  "class 3: ",
+                                  "class 2: ",
+                                  "class 4: ",
+                                  "class 1: ")) +
+  scale_shape_discrete(name = "Class", 
+                       labels = class.lab.p,
+                       limits = c("class 5: ",
+                                  "class 3: ",
+                                  "class 2: ",
+                                  "class 4: ",
+                                  "class 1: ")) +
+  # increase font size of legend and spacing between labels
+  theme(legend.text = element_text(
+    lineheight = .8,
+    size = 10), 
+    legend.key.height = unit(.8, "cm")) +
+  theme_minimal()
+dev.off()
+
 # As Bars (by relationship indicators)
 png(file = paste0(folder.graph, paste0("latprof_bars_",kin.l,"_", best, ".png")), 
     width = 800, height = 500)

@@ -5,7 +5,7 @@
 folder.graph <- paste0(folder.graph.model, best, "_output/")
 ifelse(!dir.exists(folder.graph), dir.create(folder.graph), "Folder already exists")
 
-folder.data <- "/Users/Bettina/Library/CloudStorage/OneDrive-DIWBerlin/projects/Kinmatrix/RelTypEur/analyses/data/"
+folder.data <- "/Users/bhuenteler/Library/CloudStorage/OneDrive-DIWBerlin/projects/Kinmatrix/RelTypEur/analyses/data/"
 
 library(readxl)
 library(flextable)
@@ -120,10 +120,13 @@ png(file = paste0(folder.graph, paste0("pred_overall.png")),
 bars
 dev.off()
 
+pdf(file = paste0(folder.graph, paste0("pred_overall.pdf")), 
+    width = 10, height = 6.5)
+bars
+dev.off()
 
 
-
-##### NUCLEAR VS EXTENDED ##### 
+ ##### NUCLEAR VS EXTENDED ##### 
 
 pred_ext_class_n <- read_excel(paste0(folder.data,"predprobs.xlsx"), sheet = "predprobs")
 
@@ -829,8 +832,7 @@ plot_group1 <- pred_ext_class_xs %>%
              fill = factor(kincat, levels = rev(sort(unique(kincat)))))) +
   geom_bar(stat = "identity", 
            position = position_dodge(width = dodge_width),
-           color = "Black",
-           size = .25) +
+           color = "Black") +
   geom_vline(xintercept = 0, color = "Black") +
   geom_text(aes(label = round(pred_num, 1)),
             position = position_dodge(width = dodge_width),
@@ -869,8 +871,7 @@ plot_group2 <- pred_ext_class_xs %>%
              fill = factor(kincat, levels = rev(sort(unique(kincat)))))) +
   geom_bar(stat = "identity", 
            position = position_dodge(width = dodge_width),
-           color = "Black",
-           size = .25) +
+           color = "Black") +
   geom_vline(xintercept = 0, color = "Black") +
   geom_text(aes(label = round(pred_num, 1)),
             position = position_dodge(width = dodge_width),
@@ -902,6 +903,16 @@ plot_group2
 # Combine the two plots using patchwork
 png(file = paste0(folder.graph, paste0("prednum_xs_cntry_bycntry.png")), 
     width = w, height = h)
+plot_group1 + plot_group2 +
+  plot_layout(widths = c(4, 1),
+              guides = 'collect',
+              axis_titles = 'collect',
+              axes = 'collect') +
+  plot_annotation(title = "Average Number of Kin by Class, Kin Category and Country \n(based on predicted probabilities controlling for gender, weighted, missing imputed)")
+dev.off()
+
+pdf(file = paste0(folder.graph, paste0("prednum_xs_cntry_bycntry.pdf")), 
+    width = 10, height = 6.5)
 plot_group1 + plot_group2 +
   plot_layout(widths = c(4, 1),
               guides = 'collect',
