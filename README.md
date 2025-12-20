@@ -20,7 +20,7 @@ We answer these questions through the following **analytical steps** and their r
      - Average marginal effects of country on probability for class membership (Figure 3)
      - Average predicted number of kin by relationship type across coutnries (Figure S2)
 
-The analyses are based on the **KINMATRIX** data release "perpared_v03.dta" from Oct 2024. Find more information on the data [here](https://kinmatrix.eu). To reproduce the results, run the code in the order indicated by the suffixes (01_ to 09_). The analyses were conducted using *R studio, Version 2023.06.0+421*, and *Stata 18.5*. 
+The analyses are based on the **KINMATRIX** data release "perpared_v03.dta" from Oct 2024. Find more information on the data [here](https://kinmatrix.eu). To reproduce the results, run the code in the order indicated by the suffixes (01_ to 09_). The analyses were conducted using *R studio, Version 2025.09.2+418*, and *Stata 19*. 
 
 For questions regarding the code, contact Bettina Hünteler (*bhuenteler@diw.de*). 
 
