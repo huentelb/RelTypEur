@@ -921,6 +921,8 @@ plot_group1 + plot_group2 +
   plot_annotation(title = "Average Number of Kin by Class, Kin Category and Country \n(based on predicted probabilities controlling for gender, weighted, missing imputed)")
 dev.off()
 
+ggsave(file = paste0(folder.graph, paste0("prednum_xs_cntry_bycntry.svg")), 
+       width=10, height=6)
 
 # By kin
 png(file = paste0(folder.graph, paste0("prednum_xs_cntry_bykin.png")), 
