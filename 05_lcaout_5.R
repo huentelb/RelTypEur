@@ -274,7 +274,7 @@ png(file = paste0(folder.graph, paste0("latprof_bars_",kin.l,"_", best, ".png"))
 lcmodel %>% 
   filter(Var2 == "Pr(2)") %>% 
 ggplot(aes(x = factor(L2), y = value, fill = Var1, group = Var1)) + 
-  geom_bar(stat = "identity", position = "dodge") +
+  geom_bar(stat = "identity", position = "dodge", color = "black") +
   geom_text(aes(label = round(value, digits = 2)), 
             position = position_dodge(.9), vjust = -1.2, size = 2.5) +
   labs(x = "Manifest items", y = "Conditional item response probabilities", 
@@ -289,10 +289,10 @@ ggplot(aes(x = factor(L2), y = value, fill = Var1, group = Var1)) +
   scale_fill_okabeito(name = "Class", 
                        labels = class.lab.p,
                       limits = c("class 5: ",
-                                 "class 2: ",
                                  "class 3: ",
-                                 "class 1: ",
-                                 "class 4: "))+
+                                 "class 2: ",
+                                 "class 4: ",
+                                 "class 1: "))+
   # increase font size of legend and spacing between labels
   theme(legend.text = element_text(
     lineheight = .8,
@@ -309,13 +309,20 @@ lcmodel %>%
     aes(x = factor(Var1), 
         y = value, 
         fill = L2)) + 
-  geom_bar(stat = "identity", position = "dodge") +
+  geom_bar(stat = "identity", 
+           position = "dodge", 
+           color = "black") +
   geom_text(aes(label = round(value, digits = 2)), 
             position = position_dodge(.9), vjust = -1.2, size = 2.5, show.legend = FALSE) +
   labs(x = "Class", 
        y = "Conditional item response probabilities", 
        title = paste0("Latent Class Analysis (",kin.L,", ", model, ")")) +
-  scale_x_discrete(labels = class.lab.p) +
+  scale_x_discrete(labels = class.lab,
+                   limits = c("class 5: ",
+                              "class 3: ",
+                              "class 2: ",
+                              "class 4: ",
+                              "class 1: ")) +
   scale_fill_okabeito(name = "Relationship indicators", 
                     labels = c("clo_lca" = "Financial support",
                                "cnf_lca" = "Conflict",
@@ -326,5 +333,72 @@ lcmodel %>%
                     limits = c("tra_lca", "cnt_lca", "clo_lca", "sup_lca", "mon_lca", "cnf_lca")) +
   theme(
     axis.title = element_text(size = 12))
+dev.off()
+
+
+
+# Add values from US study
+#C1: Detached
+#C2: Disharm
+#C3: Connected
+#C4: Intimate
+#C5: Tight
+
+#              det, dis, con, int, tigh 
+US_values <- c(.18, .87, .28, .09, .30, # cnf
+               .01, .63, .85, .34, 1.0, # cnt
+               .03, .08, .55, .63, .96, # clo
+               .00, .25, .08, .08, .35, # mon
+               .06, .59, .08, .77, .97, # sup
+               .12, .56, .56, .25, .58  # tra
+              )
+
+lcmodel_US <- lcmodel %>% 
+  filter(Var2 == "Pr(2)") %>% 
+  cbind(US_values)
+
+# change order of bars
+lcmodel_US$L2 <- factor(lcmodel_US$L2,
+                        levels = c("tra_lca", "cnt_lca", "clo_lca", "sup_lca", "mon_lca", "cnf_lca"))
+
+
+png(file = paste0(folder.graph, paste0("latprof_",kin.l,"_", best, "_UScomp.png")), 
+    width = 800, height = 500)
+lcmodel_US %>%
+  ggplot(aes(x = factor(Var1),
+             y = value,
+             fill = L2)) +
+  geom_bar(stat = "identity",
+           position = "dodge",
+           color = "black") +
+  geom_text(aes(label = round(value, digits = 2)),
+            position = position_dodge(.9), vjust = -1.7, size = 2.7, show.legend = FALSE) +
+  geom_point(
+    aes(x = factor(Var1),
+        y = US_values),
+    position = position_dodge(width = .9),
+    size = 2.5,
+    color = "black",
+    shape = 18,
+    show.legend = FALSE
+  ) +
+  labs(x = "Class",
+       y = "Conditional item response probabilities",
+       title = paste0("Latent Class Analysis (", kin.L, ", ", model, ")")) +
+  scale_x_discrete(labels = class.lab,
+                   limits = c("class 5: ",
+                              "class 3: ",
+                              "class 2: ",
+                              "class 4: ",
+                              "class 1: ")) +
+  scale_fill_brewer(type = "div", palette = "RdBu",
+                    name = "Relationship indicators",
+                    labels = c("clo_lca" = "Emotional closeness",
+                                 "cnf_lca" = "Conflict",
+                                 "cnt_lca" = "Frequency of contact",
+                                 "mon_lca" = "Financial support",
+                                 "sup_lca" = "Social support",
+                                 "tra_lca" = "Geographic proximity")) +
+  theme(axis.title = element_text(size = 12))
 dev.off()
 

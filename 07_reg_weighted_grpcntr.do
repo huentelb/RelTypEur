@@ -29,7 +29,7 @@ set scheme white_tableau, perm
 set showbaselevels on
 graph set window fontface "Times New Roman"
 
-
+version 19.5
 
 *******************************
 *** SET UP
@@ -341,7 +341,7 @@ save $WD/data/lc_analytical.dta, replace
 
 
 *********************************
-*** TABLE 2 - SAMPLE DESCRIPTION 
+*** TABLE 1 - SAMPLE DESCRIPTION 
 *********************************
 
 use $WD/data/lc_analytical.dta, clear
@@ -363,7 +363,7 @@ global rel tra cnt_ clo sup mon cnf
 	restore
 
 	
-* number of kin and socio-demographics for anchors TABLE 2
+* number of kin and socio-demographics for anchors TABLE 1
 
 * socio-demographics: anchor-level
 preserve
@@ -388,7 +388,7 @@ estpost sum $rel [aweight = dwe], det
 	
 	
 	
-* TABLE 2 by cntry
+* TABLE 1 by cntry
 preserve
 keep if help == 1
 levelsof cntry, local(cntry)
@@ -450,7 +450,7 @@ restore
 	}
 	
 	
-* TABLE 2 by class
+* TABLE 1 by class
 preserve
 keep if help == 1
 levelsof class, local(class)
@@ -480,33 +480,6 @@ estpost sum $kin if class == `x' [aweight = dwe], det
 		title(Description of sample by cluster) 
 		
 		
-		
-* TABLE 2 by gender
-preserve
-keep if help == 1
-foreach x of numlist 1 2 {
-estpost sum $sociodemo $kin total_kin if female == `x' [aweight = dwe], det
-	eststo tab1gnd_`x'
-	}
-restore	
-*	 relationship indicators over all relationships (not just first row!)
-	foreach x of numlist 1 2 {
-	estpost sum $rel if female == `x' [aweight = dwe], det
-	eststo tab1gnd_rel_`x'
-	}
-	
-
-	
-	* save table
-	cd $M
-	esttab tab1gnd_* using des_gnd_weighted.rtf, ///
-		cells(mean(fmt(%12.2fc) l(Mean))) ///
-		mtitle("Male" "Female") replace label ///
-		title(Description of sample by gender) 
-		
-	esttab tab1gnd_rel_* using des_gnd_weighted.rtf, append
-
-
 
 
 
@@ -525,12 +498,12 @@ global controls "i.fem"
 * kin_cat_l
 mlogit class i.kin_cat_l [pweight = dwe], vce(cluster anc_id)
 est store mlogit_l
-outreg2 using $M/mlogit_l.doc, label stats(coef se) aster() ///
+outreg2 using $M/mlogit_l.doc, label stats(coef ci)  ///
 	adds(Pseudo R2, e(r2_p)) dec(2) replace nocons
 
 mlogit class i.kin_cat_l##ib3.cntry $controls [pweight = dwe], vce(cluster anc_id)
 est store mlogit_l_cntry
-outreg2 using $M/mlogit_l.doc, label stats(coef se) aster() ///
+outreg2 using $M/mlogit_l.doc, label stats(coef ci)  ///
 	adds(Pseudo R2, e(r2_p)) dec(2) append nocons
 
 
@@ -560,15 +533,15 @@ margins [pweight = dwe], dydx(i.kin_cat_l i.cntry $controls) predict(outcome(2))
 est store m2
 
 est restore	mlogit_l_cntry
-margins [pweight = dwe], dydx(i.kin_cat_l  i.cntry $controls) predict(outcome(3)) post
+margins [pweight = dwe], dydx(i.kin_cat_l i.cntry $controls) predict(outcome(3)) post
 est store m3
 
 est restore	mlogit_l_cntry
-margins [pweight = dwe], dydx(i.kin_cat_l  i.cntry $controls) predict(outcome(4)) post
+margins [pweight = dwe], dydx(i.kin_cat_l i.cntry $controls) predict(outcome(4)) post
 est store m4
 
 est restore	mlogit_l_cntry
-margins [pweight = dwe], dydx(i.kin_cat_l  i.cntry $controls) predict(outcome(5)) post
+margins [pweight = dwe], dydx(i.kin_cat_l i.cntry $controls) predict(outcome(5)) post
 est store m5
 
 
@@ -677,7 +650,9 @@ coefplot 	(m1, label("$cl1")) 	///
 		gr export $M/ame_cov_l_cntry.pdf, replace
 		gr save $M/ame_cov_l_cntry, replace
 
-		
+	
+	
+*** FIGURE 3
 coefplot 	m1, bylabel("$cl1b") nokey msymbol(o) ||	///
 			m2, bylabel("$cl2b") nokey msymbol(t) ||	///
 			m3, bylabel("$cl3b") nokey msymbol(s) ||	///
@@ -691,7 +666,7 @@ coefplot 	m1, bylabel("$cl1b") nokey msymbol(o) ||	///
 	byopts(row(1))												///
 	msize(medlarge)												///
 	name(covariates_base_nokin_sep, replace)	
-
+	
 		gr export $M/ame_cov_l_cntry_sep.png, replace
 		gr export $M/ame_cov_l_cntry_sep.pdf, replace
 		gr save $M/ame_cov_l_cntry_sep, replace	

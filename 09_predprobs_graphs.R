@@ -19,6 +19,14 @@ h <- 500
 dodge_width <- .9
 theme_set(theme_minimal())
 
+
+class.lab.wrap <- c("1" = "Tight-knit",
+                    "2" = "Connected-but-\nautonomous", 
+                    "3" = "Disharmonious-\nbut-supportive",
+                    "4" = "Intimate-\nbut-distant",
+                    "5" = "Detached")
+
+
 ##### OVERALL (KIN CAT L; no country diffs) ##### 
 
 pred_class_overall <- read_excel(paste0(folder.data,"predprobs_overall.xlsx"), sheet = "predprobs")
@@ -129,12 +137,6 @@ dev.off()
  ##### NUCLEAR VS EXTENDED ##### 
 
 pred_ext_class_n <- read_excel(paste0(folder.data,"predprobs.xlsx"), sheet = "predprobs")
-
-class.lab.wrap <- c("1" = "Tight-knit",
-                    "2" = "Connected-but-\nautonomous", 
-                    "3" = "Disharmonious-\nbut-supportive",
-                    "4" = "Intimate-\nbut-distant",
-                    "5" = "Detached")
 
 # By Country
 png(file = paste0(folder.graph, paste0("pp_n_cntry.png")), 
