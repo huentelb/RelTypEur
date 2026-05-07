@@ -2,10 +2,10 @@
 
 * A typology of nuclear and extended family relations in Europe
 * Bettina Hünteler
-* 18.11.2025
+* 24.04.2026
 * bhuenteler@diw.de
 
-*** 07 REGRESSION ANALYSIS – MAIN: IMPUTED MISSING REL INDICATORS *** 
+*** 10 REGRESSION ANALYSIS – ROBUST: DISAGGREGATE NORDIC COUNTRIES *** 
 
 *-------------------------------------------------------------------------------
 
@@ -21,7 +21,7 @@ global DO 	"$WD/code"
 global LOG	"$WD/log"
 global GR	"$WD/graphs"
 
-global M	"$WD/graphs/251104/M11_median/lc5_output/ame_weighted_NORgrp"
+global M	"$WD/graphs/251104/M11_median/lc5_output/ame_weighted"
 
 *** stata settings
 set more off, perm
@@ -320,23 +320,24 @@ replace dwe = w_6mm if cntry == 6 & fem == 0 & edu == 2 & dwe == .	// cntry6 mal
 
 
 
-*** Group Nordic countries because of small per-country-sample size
-gen cntry_orig = cntry
-	lab val cntry_orig cntry
 
-* Sort countries according to 'closeness'
-recode cntry (4=1)(9=2)(2=3)(3=4)(1=5)(5/8=6)
-	lab def cntry2 	1"IT"	///
-					2"NL"	///
-					3"DE"	///
-					4"PL"	///
-					5"UK"	///
-					6"Nor"	, replace
-	lab val cntry cntry2
+* Sort countries according to 'closeness' while keeping Nordic country together
+rename cntry cntryorig 
 
-
+recode cntryorig 	(4=1 "IT")	///
+					(9=2 "NL")	///
+					(2=3 "DE")	///
+					(3=4 "PL")	///
+					(1=5 "UK")	///
+					(5=6 "SE")	///
+					(6=7 "DK")	///
+					(8=8 "FI")	///
+					(7=9 "NO"), gen(cntry) l(cntry_new)
+					
+drop cntry_*
+tab cntry, gen(cntry_)
+					
 save $WD/data/lc_analytical.dta, replace
-
 
 
 
@@ -346,21 +347,12 @@ save $WD/data/lc_analytical.dta, replace
 
 use $WD/data/lc_analytical.dta, clear
 
+
+					
 * store list of relevant variables as globals
-global sociodemo anc_age cntry_* fem edu_*
+global sociodemo anc_age fem edu_*
 global kin num_*
 global rel tra cnt_ clo sup mon cnf
-
-
-	* gender diff for rel indicators
-	preserve
-	*keep if help == 1
-	keep if kin_cat_l <= 4
-	foreach x of varlist $rel {
-		tab `x' female, col
-		bys female: sum `x'
-	}
-	restore
 
 	
 * number of kin and socio-demographics for anchors TABLE 1
@@ -368,7 +360,7 @@ global rel tra cnt_ clo sup mon cnf
 * socio-demographics: anchor-level
 preserve
 keep if help == 1
-estpost sum $sociodemo $kin total_kin [aweight = dwe], det
+estpost sum cntry_* $sociodemo $kin total_kin [aweight = dwe], det
 	eststo tab1
 restore	
 
@@ -378,11 +370,11 @@ estpost sum $rel [aweight = dwe], det
 
 	* save table
 	cd $M
-	esttab tab1 using des.rtf, ///
+	esttab tab1 using des_Nordic.rtf, ///
 		cells(mean(fmt(%12.2fc) l(Mean))) ///
 		replace label ///
 		title(Description of sample) 
-	esttab tab1b using des.rtf,	///
+	esttab tab1b using des_Nordic.rtf,	///
 		cells(mean(fmt(%12.2fc) l(Mean))) ///
 		append label 
 	
@@ -405,15 +397,14 @@ estpost sum $rel if cntry == `x' [aweight = dwe], det
 
 	* save table
 	cd $M
-	esttab tab1cntry_* using des_cntry.rtf, ///
+	esttab tab1cntry_* using des_cntry_Nordic.rtf, ///
 		cells(mean(fmt(%12.2fc) l(Mean))) ///
 		replace label ///
 		title(Description of sample) 
-	esttab tab1bcntry_* using des_cntry.rtf,	///
+	esttab tab1bcntry_* using des_cntry_Nordic.rtf,	///
 		cells(mean(fmt(%12.2fc) l(Mean))) ///
 		append label 
 
-		
 		
 	* test for significant differences by country
 	* ANCHOR level
@@ -430,7 +421,7 @@ preserve
 	}	
 	
 	* categorical vars
-	foreach x of varlist fem edu_1 edu_2 edu_3 {
+	foreach x of varlist fem {
 	
 	di "`x'"
 	qui: logit `x' i.cntry [pweight = dwe]
@@ -449,52 +440,17 @@ restore
 	
 	}
 	
+
 	
-* TABLE 1 by class
-preserve
-keep if help == 1
-levelsof class, local(class)
-foreach x of local class {
-estpost sum $sociodemo $kin total_kin [aweight = dwe], det
-	eststo tab1clust_`x'
-	}
-restore	
-
-	* save table
-	cd $M
-	esttab tab1clust_* using des_clust_det.rtf, ///
-		cells(mean(fmt(%12.2fc) l(Mean)) sd(fmt(%12.2fc) l("(SD)") par)) ///
-		mtitle("$cl1" "$cl2" "$cl3" "$cl4" "$cl5") replace label ///
-		title(Description of sample by cluster) 
-
-foreach x of local class {
-estpost sum $kin if class == `x' [aweight = dwe], det
-	eststo tab1clust_`x'
-	}
 	
-	* save table
-	cd $M
-	esttab tab1clust_* using des_clust.rtf, ///
-		cells(mean(fmt(%12.2fc) l(Mean)) sd(fmt(%12.2fc) l("(SD)") par)) ///
-		mtitle("$cl1" "$cl2" "$cl3" "$cl4" "$cl5") replace label ///
-		title(Description of sample by cluster) 
-		
-		
-
-
-
-
-
+	
 *************************
 *** MULTINOMIAL LOGIT ***
 *************************
 
-
-use $WD/data/lc_analytical.dta, clear
-
 global controls "i.fem"
 
-
+	
 * kin_cat_l
 mlogit class i.kin_cat_l [pweight = dwe], vce(cluster anc_id)
 est store mlogit_l
@@ -504,9 +460,8 @@ outreg2 using $M/mlogit_l.doc, label stats(coef ci)  ///
 mlogit class i.kin_cat_l##ib3.cntry $controls [pweight = dwe], vce(cluster anc_id)
 est store mlogit_l_cntry
 outreg2 using $M/mlogit_l.doc, label stats(coef ci)  ///
-	adds(Pseudo R2, e(r2_p)) dec(2) append nocons
-
-
+	adds(Pseudo R2, e(r2_p)) dec(2) append nocons	
+	
 	
 ****************
 *** PLOT AME ***
@@ -525,101 +480,49 @@ grstyle set symbol o t s + sh
 		
 * store results for each class in separate model for easier plotting
 est restore	mlogit_l_cntry
-margins [pweight = dwe], dydx(i.kin_cat_l i.cntry $controls) predict(outcome(1)) post
+margins [pweight = dwe], dydx(i.cntry) predict(outcome(1)) post pwcompare(groups)
 est store m1
 
 est restore	mlogit_l_cntry
-margins [pweight = dwe], dydx(i.kin_cat_l i.cntry $controls) predict(outcome(2)) post
+margins [pweight = dwe], dydx(i.cntry) predict(outcome(2)) post pwcompare(groups)
 est store m2
 
 est restore	mlogit_l_cntry
-margins [pweight = dwe], dydx(i.kin_cat_l i.cntry $controls) predict(outcome(3)) post
+margins [pweight = dwe], dydx(i.cntry) predict(outcome(3)) post pwcompare(groups)
 est store m3
 
 est restore	mlogit_l_cntry
-margins [pweight = dwe], dydx(i.kin_cat_l i.cntry $controls) predict(outcome(4)) post
+margins [pweight = dwe], dydx(i.cntry) predict(outcome(4)) post pwcompare(groups)
 est store m4
 
 est restore	mlogit_l_cntry
-margins [pweight = dwe], dydx(i.kin_cat_l i.cntry $controls) predict(outcome(5)) post
+margins [pweight = dwe], dydx(i.cntry) predict(outcome(5)) post pwcompare(groups)
 est store m5
 
+/*
+est restore	mlogit_l_cntry
+margins i.cntry [pweight = dwe], predict(outcome(1)) post pwcompare(groups)
+est store m1_cntr
 
+est restore	mlogit_l_cntry
+margins i.cntry [pweight = dwe], predict(outcome(2)) post pwcompare(groups)
+est store m2_cntr
 
-*** 1. Plot AME with all covariates
+est restore	mlogit_l_cntry
+margins i.cntry [pweight = dwe], predict(outcome(3)) post pwcompare(groups)
+est store m3_cntr
 
-coefplot 	(m1, label("$cl1")) 	///
-			(m2, label("$cl2")) 	///
-			(m3, label("$cl3")) 	///
-			(m4, label("$cl4"))		///
-			(m5, label("$cl5")),	///
-	recast(scatter) 												///
-	drop(_cons) 													///
-	xtitle("Effects on Probability")  								///
-	xline(0, lwidth(thin) lcolor(gs10) lpattern(solid)) 			///
-	///ysize(13) xsize(10) 											///
-	legend(title("Class", size(3)))									///
-	msize(medlarge)													///
-	title("Average Marginal Effects", size(4)) 						///
-	note("Missing imputed with 0 - 'detached'" 						///
-		"N = `e(N)' observations", size(2))							///
-	name(covariates, replace)
-	
-		gr export $M/ame_cov_l.png, replace
-		gr export $M/ame_cov_l.pdf, replace
-		gr save $M/ame_cov_l, replace
+est restore	mlogit_l_cntry
+margins i.cntry [pweight = dwe], predict(outcome(4)) post pwcompare(groups)
+est store m4_cntr
 
+est restore	mlogit_l_cntry
+margins i.cntry [pweight = dwe], predict(outcome(5)) post pwcompare(groups)
+est store m5_cntr
+*/
 
 		
-*** 2. Plot AME with all covariates + base levels (e.g., female = 0)
-
-coefplot 	(m1, label("$cl1")) 	///
-			(m2, label("$cl2")) 	///
-			(m3, label("$cl3")) 	///
-			(m4, label("$cl4"))		///
-			(m5, label("$cl5")),	///
-	recast(scatter) 												///
-	drop(_cons) keep(*:) omitted baselevels							///
-	xtitle("Effects on Probability") 								///
-	xline(0, lwidth(thin) lcolor(gs10) lpattern(solid)) 			///
-	///ysize(13) xsize(10) 											///
-	legend(title("Class", size(3)))									///
-	msize(medlarge)													///
-	title("Average Marginal Effects", size(4)) 						///
-	note("Missing imputed with 0 - 'detached'" 						///
-		"N = `e(N)' observations", size(2))							///
-	name(covariates_base, replace)
-		
-		gr export $M/ame_cov_l_base.png, replace
-		gr export $M/ame_cov_l_base.pdf, replace
-		gr save $M/ame_cov_l_base, replace
-
-		
-*** 3. Plot AME without kin + base levels (e.g., female = 0)		
-
-coefplot 	(m1, label("$cl1")) 	///
-			(m2, label("$cl2")) 	///
-			(m3, label("$cl3")) 	///
-			(m4, label("$cl4"))		///
-			(m5, label("$cl5")),	///
-	recast(scatter) 												///
-	drop(_cons *kin_cat_l) keep(*:) omitted baselevels				///
-	xtitle("Effects on Probability") 								///
-	xline(0, lwidth(thin) lcolor(gs10) lpattern(solid)) 			///
-	///ysize(13) xsize(10) 											///
-	legend(title("Class", size(3)))									///
-	msize(medlarge)													///
-	title("Average Marginal Effects", size(4)) 						///
-	note("Missing imputed with 0 - 'detached'" 						///
-		"N = `e(N)' observations", size(2))							///
-	name(covariates_base_nokin, replace)
-		
-		gr export $M/ame_cov_l_base_nokin.png, replace
-		gr export $M/ame_cov_l_base_nokin.pdf, replace
-		gr save $M/ame_cov_l_base_nokin, replace
-
-		
-*** 4. Plot AME of country only
+*** Plot AME of country only (recreate main plot)
 
 grstyle init
 grstyle set plain, grid 
@@ -629,30 +532,7 @@ grstyle set color Okabe, select(2/6): p#markline
 grstyle set symbol o t s + sh 										
 
 
-coefplot 	(m1, label("$cl1")) 	///
-			(m2, label("$cl2")) 	///
-			(m3, label("$cl3")) 	///
-			(m4, label("$cl4"))		///
-			(m5, label("$cl5")),	///
-	recast(scatter) 												///
-	drop(_cons *kin_cat_l) keep(*cntry) omitted baselevels			///
-	xtitle("Effects on Probability") 								///
-	xline(0, lwidth(thin) lcolor(gs10) lpattern(solid)) 			///
-	///ysize(13) xsize(10) 											///
-	legend(title("Class", size(3)))									///
-	msize(medlarge)													///
-	title("Average Marginal Effects", size(4)) 						///
-	note("Missing imputed with 0 - 'detached'" 						///
-		"N = `e(N)' observations", size(2))							///
-	name(covariates_base_nokin, replace)	
 		
-		gr export $M/ame_cov_l_cntry.png, replace
-		gr export $M/ame_cov_l_cntry.pdf, replace
-		gr save $M/ame_cov_l_cntry, replace
-
-	
-	
-*** FIGURE 3
 coefplot 	m1, bylabel("$cl1b") nokey msymbol(o) ||	///
 			m2, bylabel("$cl2b") nokey msymbol(t) ||	///
 			m3, bylabel("$cl3b") nokey msymbol(s) ||	///
@@ -666,35 +546,11 @@ coefplot 	m1, bylabel("$cl1b") nokey msymbol(o) ||	///
 	byopts(row(1))												///
 	msize(medlarge)												///
 	name(covariates_base_nokin_sep, replace)	
-	
+
 		gr export $M/ame_cov_l_cntry_sep.png, replace
 		gr export $M/ame_cov_l_cntry_sep.pdf, replace
 		gr save $M/ame_cov_l_cntry_sep, replace	
 	
-		
-*** 5. Plot AME of kin category only
-
-coefplot 	(m1, label("$cl1")) 	///
-			(m2, label("$cl2")) 	///
-			(m3, label("$cl3")) 	///
-			(m4, label("$cl4"))		///
-			(m5, label("$cl5")),	///
-	recast(scatter) 												///
-	drop(_cons) keep(*kin_cat_l) omitted baselevels					///
-	xtitle("Effects on Probability") 								///
-	xline(0, lwidth(thin) lcolor(gs10) lpattern(solid)) 			///
-	///ysize(13) xsize(10) 											///
-	legend(title("Class", size(3)))									///
-	msize(medlarge)													///
-	title("Average Marginal Effects", size(4)) 						///
-	note("Missing imputed with 0 - 'detached'" 						///
-		"N = `e(N)' observations", size(2))							///
-	name(covariates_base_kin, replace)
-		
-		gr export $M/ame_cov_l_base_kin.png, replace
-		gr export $M/ame_cov_l_base_kin.pdf, replace
-		gr save $M/ame_cov_l_base_kin, replace
-		
 
 	
 	
