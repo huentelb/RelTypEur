@@ -179,7 +179,7 @@ dev.off()
 # Profile Plot
 png(file = paste0(folder.graph, paste0("latprof_",kin.l,"_", best, ".png")), 
     width = 800, height = 500)
-lcmodel %>% 
+main <- lcmodel %>% 
   filter(Var2 == "Pr(2)") %>% 
 ggplot(
   aes(x = factor(L2), 
@@ -371,8 +371,11 @@ lcmodel_US %>%
   geom_bar(stat = "identity",
            position = "dodge",
            color = "black") +
-  geom_text(aes(label = round(value, digits = 2)),
-            position = position_dodge(.9), vjust = -1.7, size = 2.7, show.legend = FALSE) +
+  geom_text(aes(label = gsub("^0\\.", ".", round(value, digits = 2))),
+            position = position_dodge(.9), 
+            vjust = -1.5, 
+            size = 3.3, 
+            show.legend = FALSE) +
   geom_point(
     aes(x = factor(Var1),
         y = US_values),
@@ -383,22 +386,29 @@ lcmodel_US %>%
     show.legend = FALSE
   ) +
   labs(x = "Class",
-       y = "Conditional item response probabilities",
-       title = paste0("Latent Class Analysis (", kin.L, ", ", model, ")")) +
+       y = "Conditional item response probabilities") +
   scale_x_discrete(labels = class.lab,
                    limits = c("class 5: ",
                               "class 3: ",
                               "class 2: ",
                               "class 4: ",
                               "class 1: ")) +
+  scale_y_continuous(limits = c(0, 1.12),
+                     breaks = seq(0, 1, .25),
+                     expand = expansion(mult = c(0, 0))) +
   scale_fill_brewer(type = "div", palette = "RdBu",
-                    name = "Relationship indicators",
+                    name = "Relationship\nindicators",
                     labels = c("clo_lca" = "Emotional closeness",
-                                 "cnf_lca" = "Conflict",
-                                 "cnt_lca" = "Frequency of contact",
-                                 "mon_lca" = "Financial support",
-                                 "sup_lca" = "Social support",
-                                 "tra_lca" = "Geographic proximity")) +
-  theme(axis.title = element_text(size = 12))
+                               "cnf_lca" = "Conflict",
+                               "cnt_lca" = "Frequency of contact",
+                               "mon_lca" = "Financial support",
+                               "sup_lca" = "Social support",
+                               "tra_lca" = "Geographic proximity")) +
+  theme(axis.title.x = element_text(size = 13, margin = margin(t = 12)),
+        axis.title.y = element_text(size = 13, margin = margin(r = 12)),
+        axis.text = element_text(size = 12, color = "black"),
+        legend.position = "bottom",
+        legend.text = element_text(size = 12),
+        legend.title = element_text(size = 12))
 dev.off()
 

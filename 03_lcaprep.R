@@ -35,16 +35,10 @@ med_cnt
 med_tra
 med_clo
 
-med_cou2 <- kin_name %>% 
-  mutate(cntry.l = ifelse(anc_cou.l == "5. Sweden" | 
-                            anc_cou.l == "6. Denmark" | 
-                            anc_cou.l == "7. Finland" | 
-                            anc_cou.l == "8. Norway", 
-                          "Nordic", anc_cou.l)) %>% 
-  dplyr::select(cntry.l, rel_clo, rel_cnf, rel_cnt, rel_tra) %>% 
-  group_by(cntry.l) %>% 
-  summarise(across(everything(), median, na.rm=TRUE))
 
+kin_name %>%
+  group_by(anc_cou.l) %>%
+  summarise(across(c(rel_cnf, rel_cnt, rel_tra, rel_clo), median, na.rm = TRUE))
 # Above median the median -> 2
 # incl and Below median median -> 1
 

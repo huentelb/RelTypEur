@@ -14,7 +14,7 @@
 *** Working directories ***
 
 /*
-global WD 	"/Users/Bettina/Library/CloudStorage/OneDrive-DIWBerlin/projects/Kinmatrix/RelTypEur/analyses/"
+global WD 	"/Users/bhuenteler/Library/CloudStorage/OneDrive-DIWBerlin/projects/Kinmatrix/RelTypEur/analyses"
 
 global IN 	"data"
 global OUT 	"data"
@@ -66,8 +66,28 @@ global cl4 "Intimate-but-distant"
 global cl5 "Detached"
 
 
+/* optional:
+* add pop shares to countries
+decode cntry, gen(cntry_s)
+
+gen 	pop = .17 if cntry_s == "IT"
+replace pop = .06 if cntry_s == "NL"
+replace pop = .28 if cntry_s == "DE"
+replace pop = .13 if cntry_s == "PL"
+replace pop = .25 if cntry_s == "UK"
+replace pop = .04 if cntry_s == "SE"
+replace pop = .02 if cntry_s == "DK"
+replace pop = .02 if cntry_s == "FI"
+replace pop = .02 if cntry_s == "NO"
 
 
+* modify personal weight to adjust for pop shares to weight overall counts accordingly
+bys cntry: gen count = _N
+gen weight = dwe/count * pop
+
+
+tab cntry [aweight = weight] // -> matches pop shares; results virtually the same
+*/
 
 ************************************************
 ***		 OVERALL PREDICTED PROBABILITIES	 ***
