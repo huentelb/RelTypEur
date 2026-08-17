@@ -27,7 +27,7 @@ global M	"$WD/graphs/251104/M11_median/lc5_output/ame_weighted"
 set more off, perm
 set scheme white_tableau, perm 
 set showbaselevels on
-graph set window fontface "Times New Roman"
+graph set window fontface "Arial"
 
 version 19.5
 
