@@ -18,9 +18,9 @@ We answer these questions through the following **analytical steps** and their r
      - Distribution of relationship patterns by kin category (predicted probabilities and average absolute kin counts; Figure 2)
    - Answer RQ 3
      - Average marginal effects of country on probability for class membership (Figure 3)
-     - Average predicted number of kin by relationship type across coutnries (Figure S2)
+     - Average predicted number of kin by relationship type across countries (Figure 4)
 
-The analyses are based on the **KINMATRIX** data release "perpared_v03.dta" from Oct 2024. Find more information on the data [here](https://kinmatrix.eu). To reproduce the results, run the code in the order indicated by the suffixes (01_ to 09_). The analyses were conducted using *R studio, Version 2025.09.2+418*, and *Stata 19*. 
+The analyses are based on the **KINMATRIX** data release "perpared_v03.dta" from Oct 2024. Find more information on the data [here](https://kinmatrix.eu). To reproduce the results, run the code in the order indicated by the suffixes (01_ to 09_). The analyses were conducted using *R studio, Version 2026.05.0+218*, and *Stata 19.5*. 
 
 For questions regarding the code, contact Bettina Hünteler (*bhuenteler@diw.de*). 
 
@@ -37,12 +37,12 @@ The relationship indicators of interest are plotted using the code in [02_univba
 In [03_lcaprep.R](03_lcaprep.R), we prepare the latent class analysis. This entails
 - dichotomization of the continuous relationship indicators,
 - imputing the remaining missing values for them, and
-- plotting the relationship indicators with the indication of the cut-offs (**Figure S1** in the manuscript). 
+- plotting the relationship indicators with the indication of the cut-offs (**Figure A-1** in the manuscript). 
 ### [04_lca.R](04_lca.R) 
-This code conducts the latent class analysis using `poLCA`, generating solutions for 1 to 7 classes (stored as RData-files for faster re-load, if necessary). Also, we calculate the classification criteria as found in **Table S1**. 
+This code conducts the latent class analysis using `poLCA`, generating solutions for 1 to 7 classes (stored as RData-files for faster re-load, if necessary). Also, we calculate the classification criteria as found in **Table A-1**. 
 ### [05_lcaout_5.R](05_lcaout_5.R) 
 This code selects the optimal cluster solution and  
-- produces **Table S2** containing the average posterior class probability
+- produces **Table A-2** containing the average posterior class probability
 - sets the class labels
 - produces different graphs showing the conditional item response probabilities (**Figure 2**)
 ### [06_prep_reg.R](06_prep_reg.R) 
@@ -53,11 +53,11 @@ This code prepares the data for analysis in *Stata*, which entails
 In *Stata*, we
 1. generate the kin count variables for different categories of kin
 2. produce **Table 1** (sample description by country)
-3. run the multinomial logistic regression models using `mlogit` (shown in **Table S3**), and
+3. run the multinomial logistic regression models using `mlogit` (shown in **Table A-3**), and
 4. plot the average marginal effect (AME) of country on class membership (**Figure 3**) using `margins` and `coefplot`
 ### [08_predprobs.do](08_predprobs.do)
 1. calculates the estimated average number of kin in each class by country, based on the multinomial logistic regressions using `margins` and
 2. estimates the p-values for the group-wise comparisons using the `pwcompare`-option (available on request).
-3. Predicted kin counts are stored in different excel-files which serve as the basis for **Figure S2**. 
+3. Predicted kin counts are stored in different excel-files which serve as the basis for **Figure 4**. 
 ### [09_predprobs_graphs.R](09_predprobs_graphs.R) 
-This code produces **Figure S2** as well as different variants of these figures incl. predicted probabilities across kin types and countries, alternating the amount of detail in the kin categories (e.g., parents vs fathers/mothers) and the organization of their display (e.g., dodged vs stacked bar plots). 
+This code produces **Figure 4**. 
